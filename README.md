@@ -73,12 +73,14 @@ Or add to the Home Assistant host compose as an image-only sidecar:
 
 ```yaml
 weather-mqtt:
-  image: ghcr.io/<you>/weather-mqtt:latest
+  image: ghcr.io/resnostyle/weather-mqtt:latest
   container_name: weather-mqtt
   restart: unless-stopped
   network_mode: host
   env_file: .env
 ```
+
+CI on `main` runs tests, then builds and pushes `linux/amd64` + `linux/arm64` images to GHCR (`ghcr.io/resnostyle/weather-mqtt`).
 
 ## Environment
 

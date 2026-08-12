@@ -3,8 +3,8 @@
 
 services:
   weather-mqtt:
-    build: .
-    # image: ghcr.io/youruser/weather-mqtt:latest
+    image: ghcr.io/resnostyle/weather-mqtt:latest
+    # build: .   # local override
     container_name: weather-mqtt
     restart: unless-stopped
     network_mode: host
