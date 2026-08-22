@@ -6,6 +6,22 @@ import (
 	"github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
 )
 
+func TestNormalizeUnit(t *testing.T) {
+	cases := map[string]string{
+		"F":  "°F",
+		"f":  "°F",
+		"C":  "°C",
+		"c":  "°C",
+		"°F": "°F",
+		"°C": "°C",
+	}
+	for in, want := range cases {
+		if got := normalizeUnit(in); got != want {
+			t.Fatalf("normalizeUnit(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
 func TestParseWeatherSourcesDefaultAndMulti(t *testing.T) {
 	single, err := ParseWeatherSources("", "weather.pirateweather")
 	if err != nil {

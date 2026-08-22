@@ -107,6 +107,20 @@ Pull requests build images without pushing. Use **Actions → CI → Run workflo
 
 After the first push, open each package under **GitHub → Packages** and set visibility/linking if needed. The workflow uses `GITHUB_TOKEN` with `packages: write`.
 
+## Kubernetes
+
+Helm charts in the k8s-gitops repo deploy both services to the `automation` namespace.
+
+**Weather** runs as a normal pod. Point `MQTT_HOST` at the in-cluster broker (e.g. `emqx.automation.svc.cluster.local`). Secrets (`HA_TOKEN`, optional `MQTT_USERNAME` / `MQTT_PASSWORD`) come from the `weather-mqtt-secrets` Vault-synced secret.
+
+**Pinger** requires `hostNetwork: true` so mDNS can discover Cast devices and TCP probes reach LAN hosts. It reuses the same `weather-mqtt-secrets` secret. For `PING_METHOD=icmp`, add `securityContext.capabilities.add: [NET_RAW]`.
+
+| Setting | Weather | Pinger |
+|---------|---------|--------|
+| Image | `ghcr.io/resnostyle/ha-mqtt` | `ghcr.io/resnostyle/ha-mqtt/pinger` |
+| Network | cluster | `hostNetwork: true` |
+| Probes | disabled (no HTTP endpoint) | disabled |
+
 ## Layout
 
 ```

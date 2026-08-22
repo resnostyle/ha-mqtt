@@ -56,7 +56,7 @@ func FromEnv() (Settings, error) {
 	return Settings{
 		Common:              common,
 		WeatherSources:      sources,
-		TemperatureUnit:     env.Get("TEMPERATURE_UNIT", "°F"),
+		TemperatureUnit:     normalizeUnit(env.Get("TEMPERATURE_UNIT", "°F")),
 		PressureUnit:        env.Get("PRESSURE_UNIT", "inHg"),
 		WindSpeedUnit:       env.Get("WIND_SPEED_UNIT", "mph"),
 		VisibilityUnit:      env.Get("VISIBILITY_UNIT", "mi"),
@@ -116,6 +116,17 @@ func ParseWeatherSources(raw, legacyEntity string) ([]Source, error) {
 		return nil, fmt.Errorf("HA_WEATHER_SOURCES is empty")
 	}
 	return sources, nil
+}
+
+func normalizeUnit(unit string) string {
+	switch strings.TrimSpace(unit) {
+	case "F", "f":
+		return "°F"
+	case "C", "c":
+		return "°C"
+	default:
+		return unit
+	}
 }
 
 func defaultLabel(name string) string {
