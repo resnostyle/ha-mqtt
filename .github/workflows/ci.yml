@@ -7,6 +7,11 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -14,6 +19,8 @@ permissions:
 
 jobs:
   test:
+    name: Test
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,25 +29,31 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24.x"
+          go-version-file: go.mod
           cache: true
 
       - name: Run tests
         run: go test ./...
 
-  build-and-push:
+  build:
+    name: Build images
     needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: always() && (needs.test.result == 'success' || needs.test.result == 'skipped')
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - service: weather
             dockerfile: Dockerfile.weather
-            image: ghcr.io/${{ github.repository }}/weather
+            image: ghcr.io/${{ github.repository }}
+            title: ha-mqtt weather
+            description: Poll Home Assistant weather and sun entities and publish retained JSON to MQTT
           - service: pinger
             dockerfile: Dockerfile.pinger
             image: ghcr.io/${{ github.repository }}/pinger
+            title: ha-mqtt pinger
+            description: Discover Google Cast devices, probe LAN connectivity, and publish metrics to MQTT
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -52,6 +65,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -64,9 +78,13 @@ jobs:
         with:
           images: ${{ matrix.image }}
           tags: |
-            type=raw,value=latest
+            type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix=
             type=ref,event=branch
+          labels: |
+            org.opencontainers.image.title=${{ matrix.title }}
+            org.opencontainers.image.description=${{ matrix.description }}
+            org.opencontainers.image.source=${{ github.repositoryUrl }}
 
       - name: Build and push ${{ matrix.service }}
         uses: docker/build-push-action@v6
@@ -74,8 +92,9 @@ jobs:
           context: .
           file: ${{ matrix.dockerfile }}
           platforms: linux/amd64,linux/arm64
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+          provenance: false
