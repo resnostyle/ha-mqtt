@@ -96,7 +96,16 @@ ha-mqtt-pinger:
   env_file: .env.pinger
 ```
 
-CI on `main` runs `go test ./...`, then builds and pushes `linux/amd64` + `linux/arm64` images to GHCR.
+Pull requests run `go test ./...` and build images without pushing. Pushes to `main` skip tests and build + push both images to GHCR.
+
+| Image | Tags |
+|-------|------|
+| `ghcr.io/resnostyle/ha-mqtt` | `latest`, commit SHA, branch name |
+| `ghcr.io/resnostyle/ha-mqtt/pinger` | `latest`, commit SHA, branch name |
+
+Pull requests build images without pushing. Use **Actions → CI → Run workflow** to trigger manually.
+
+After the first push, open each package under **GitHub → Packages** and set visibility/linking if needed. The workflow uses `GITHUB_TOKEN` with `packages: write`.
 
 ## Layout
 
