@@ -4,7 +4,7 @@ Go services that poll Home Assistant and publish retained JSON to Mosquitto, wit
 
 | Service | Binary | Image |
 |---------|--------|-------|
-| Weather + sun | `cmd/weather` | `ghcr.io/resnostyle/ha-mqtt` |
+| Weather + sun | `cmd/weather` | `ghcr.io/resnostyle/ha-mqtt/weather` |
 | Cast / Google Home ping | `cmd/pinger` | `ghcr.io/resnostyle/ha-mqtt/pinger` |
 
 Shared code lives under [`internal/lib`](internal/lib) (HA client, MQTT publisher, env helpers).
@@ -82,7 +82,7 @@ Or add sidecars to your Home Assistant host compose:
 
 ```yaml
 ha-mqtt-weather:
-  image: ghcr.io/resnostyle/ha-mqtt:latest
+  image: ghcr.io/resnostyle/ha-mqtt/weather:latest
   container_name: ha-mqtt-weather
   restart: unless-stopped
   network_mode: host
@@ -100,12 +100,26 @@ Pull requests run `go test ./...` and build images without pushing. Pushes to `m
 
 | Image | Tags |
 |-------|------|
-| `ghcr.io/resnostyle/ha-mqtt` | `latest`, commit SHA, branch name |
+| `ghcr.io/resnostyle/ha-mqtt/weather` | `latest`, commit SHA, branch name |
 | `ghcr.io/resnostyle/ha-mqtt/pinger` | `latest`, commit SHA, branch name |
 
 Pull requests build images without pushing. Use **Actions → CI → Run workflow** to trigger manually.
 
 After the first push, open each package under **GitHub → Packages** and set visibility/linking if needed. The workflow uses `GITHUB_TOKEN` with `packages: write`.
+
+## Kubernetes
+
+Helm charts in the k8s-gitops repo deploy both services to the `automation` namespace.
+
+**Weather** runs as a normal pod. Point `MQTT_HOST` at the in-cluster broker (e.g. `emqx.automation.svc.cluster.local`). Secrets (`HA_TOKEN`, optional `MQTT_USERNAME` / `MQTT_PASSWORD`) come from the `weather-mqtt-secrets` Vault-synced secret.
+
+**Pinger** requires `hostNetwork: true` so mDNS can discover Cast devices and TCP probes reach LAN hosts. It reuses the same `weather-mqtt-secrets` secret. For `PING_METHOD=icmp`, add `securityContext.capabilities.add: [NET_RAW]`.
+
+| Setting | Weather | Pinger |
+|---------|---------|--------|
+| Image | `ghcr.io/resnostyle/ha-mqtt/weather` | `ghcr.io/resnostyle/ha-mqtt/pinger` |
+| Network | cluster | `hostNetwork: true` |
+| Probes | disabled (no HTTP endpoint) | disabled |
 
 ## Layout
 

@@ -46,12 +46,12 @@ jobs:
         include:
           - service: weather
             dockerfile: Dockerfile.weather
-            image: ghcr.io/${{ github.repository }}
+            image: ghcr.io/resnostyle/ha-mqtt/weather
             title: ha-mqtt weather
             description: Poll Home Assistant weather and sun entities and publish retained JSON to MQTT
           - service: pinger
             dockerfile: Dockerfile.pinger
-            image: ghcr.io/${{ github.repository }}/pinger
+            image: ghcr.io/resnostyle/ha-mqtt/pinger
             title: ha-mqtt pinger
             description: Discover Google Cast devices, probe LAN connectivity, and publish metrics to MQTT
     steps:

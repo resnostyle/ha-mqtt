@@ -3,7 +3,7 @@
 
 services:
   weather:
-    image: ghcr.io/resnostyle/ha-mqtt:latest
+    image: ghcr.io/resnostyle/ha-mqtt/weather:latest
     # build:
     #   context: .
     #   dockerfile: Dockerfile.weather
