@@ -121,3 +121,55 @@ func TestWSRegistry(t *testing.T) {
 		t.Fatalf("%v", devices)
 	}
 }
+
+func TestWSRegistryLargePayload(t *testing.T) {
+	largeName := strings.Repeat("x", 40*1024)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/websocket" {
+			http.NotFound(w, r)
+			return
+		}
+		conn, err := websocket.Accept(w, r, nil)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer conn.Close(websocket.StatusNormalClosure, "")
+		ctx := r.Context()
+		_ = wsjson.Write(ctx, conn, map[string]any{"type": "auth_required"})
+		var auth map[string]any
+		if err := wsjson.Read(ctx, conn, &auth); err != nil {
+			return
+		}
+		_ = wsjson.Write(ctx, conn, map[string]any{"type": "auth_ok"})
+		var req map[string]any
+		if err := wsjson.Read(ctx, conn, &req); err != nil {
+			return
+		}
+		_ = wsjson.Write(ctx, conn, map[string]any{
+			"id":      req["id"],
+			"success": true,
+			"result": []map[string]any{
+				{"entity_id": "media_player.big", "platform": "cast", "name": largeName},
+			},
+		})
+	}))
+	defer srv.Close()
+
+	c := New(srv.URL, "tok", 5*time.Second)
+	entities, err := c.ListEntityRegistry(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entities) != 1 || deref(entities[0].Name) != largeName {
+		t.Fatalf("unexpected entities: %+v", entities)
+	}
+}
+
+func deref(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
+}

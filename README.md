@@ -4,7 +4,7 @@ Go services that poll Home Assistant and publish retained JSON to Mosquitto, wit
 
 | Service | Binary | Image |
 |---------|--------|-------|
-| Weather + sun | `cmd/weather` | `ghcr.io/resnostyle/ha-mqtt` |
+| Weather + sun | `cmd/weather` | `ghcr.io/resnostyle/ha-mqtt/weather` |
 | Cast / Google Home ping | `cmd/pinger` | `ghcr.io/resnostyle/ha-mqtt/pinger` |
 
 Shared code lives under [`internal/lib`](internal/lib) (HA client, MQTT publisher, env helpers).
@@ -82,7 +82,7 @@ Or add sidecars to your Home Assistant host compose:
 
 ```yaml
 ha-mqtt-weather:
-  image: ghcr.io/resnostyle/ha-mqtt:latest
+  image: ghcr.io/resnostyle/ha-mqtt/weather:latest
   container_name: ha-mqtt-weather
   restart: unless-stopped
   network_mode: host
@@ -100,7 +100,7 @@ Pull requests run `go test ./...` and build images without pushing. Pushes to `m
 
 | Image | Tags |
 |-------|------|
-| `ghcr.io/resnostyle/ha-mqtt` | `latest`, commit SHA, branch name |
+| `ghcr.io/resnostyle/ha-mqtt/weather` | `latest`, commit SHA, branch name |
 | `ghcr.io/resnostyle/ha-mqtt/pinger` | `latest`, commit SHA, branch name |
 
 Pull requests build images without pushing. Use **Actions → CI → Run workflow** to trigger manually.
@@ -117,7 +117,7 @@ Helm charts in the k8s-gitops repo deploy both services to the `automation` name
 
 | Setting | Weather | Pinger |
 |---------|---------|--------|
-| Image | `ghcr.io/resnostyle/ha-mqtt` | `ghcr.io/resnostyle/ha-mqtt/pinger` |
+| Image | `ghcr.io/resnostyle/ha-mqtt/weather` | `ghcr.io/resnostyle/ha-mqtt/pinger` |
 | Network | cluster | `hostNetwork: true` |
 | Probes | disabled (no HTTP endpoint) | disabled |
 

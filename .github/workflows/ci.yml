@@ -46,7 +46,7 @@ jobs:
         include:
           - service: weather
             dockerfile: Dockerfile.weather
-            image: ghcr.io/resnostyle/ha-mqtt
+            image: ghcr.io/resnostyle/ha-mqtt/weather
             title: ha-mqtt weather
             description: Poll Home Assistant weather and sun entities and publish retained JSON to MQTT
           - service: pinger

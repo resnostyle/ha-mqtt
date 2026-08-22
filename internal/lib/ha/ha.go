@@ -16,6 +16,9 @@ import (
 	"github.com/coder/websocket/wsjson"
 )
 
+// HA registry list responses can exceed the coder/websocket default (32 KiB).
+const wsReadLimit = 16 * 1024 * 1024
+
 type Client struct {
 	baseURL    string
 	token      string
@@ -208,6 +211,7 @@ func (c *Client) wsRequest(ctx context.Context, msgType string, dest any) error 
 		return fmt.Errorf("ha websocket dial: %w", err)
 	}
 	defer conn.Close(websocket.StatusNormalClosure, "")
+	conn.SetReadLimit(wsReadLimit)
 
 	var hello map[string]any
 	if err := wsjson.Read(ctx, conn, &hello); err != nil {
