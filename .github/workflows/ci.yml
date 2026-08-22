@@ -37,7 +37,7 @@ jobs:
         include:
           - service: weather
             dockerfile: Dockerfile.weather
-            image: ghcr.io/${{ github.repository }}
+            image: ghcr.io/${{ github.repository }}/weather
           - service: pinger
             dockerfile: Dockerfile.pinger
             image: ghcr.io/${{ github.repository }}/pinger
