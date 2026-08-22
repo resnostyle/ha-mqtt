@@ -1,12 +1,28 @@
-# Example sidecar next to Home Assistant / Mosquitto.
-# Copy env from .env.example and point image at your build or registry.
+# Example sidecar services next to Home Assistant / Mosquitto.
+# Copy env from .env.example (weather) and .env.pinger.example (pinger).
 
 services:
-  weather-mqtt:
-    image: ghcr.io/resnostyle/weather-mqtt:latest
-    # build: .   # local override
-    container_name: weather-mqtt
+  weather:
+    image: ghcr.io/resnostyle/ha-mqtt:latest
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.weather
+    container_name: ha-mqtt-weather
     restart: unless-stopped
     network_mode: host
     env_file:
       - .env
+
+  pinger:
+    image: ghcr.io/resnostyle/ha-mqtt/pinger:latest
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.pinger
+    container_name: ha-mqtt-pinger
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - .env.pinger
+    # Required for PING_METHOD=icmp:
+    # cap_add:
+    #   - NET_RAW

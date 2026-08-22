@@ -1,0 +1,20 @@
+[tools]
+go = "1.24"
+
+[env]
+_.path = ["{{config_root}}/bin"]
+
+[tasks.test]
+run = "go test ./..."
+
+[tasks.weather]
+run = "go run ./cmd/weather"
+
+[tasks.pinger]
+run = "go run ./cmd/pinger"
+
+[tasks.build]
+run = [
+  "go build -o bin/weather ./cmd/weather",
+  "go build -o bin/pinger ./cmd/pinger",
+]

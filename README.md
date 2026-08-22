@@ -1,53 +1,56 @@
-# weather-mqtt
+# ha-mqtt
 
-Poll Home Assistant weather entities (Pirate Weather, Met.no, …) and publish
-retained JSON to Mosquitto, plus Home Assistant MQTT discovery so sensors appear
-automatically under one device per source.
+Go services that poll Home Assistant and publish retained JSON to Mosquitto, with optional Home Assistant MQTT discovery.
 
-## Sources
+| Service | Binary | Image |
+|---------|--------|-------|
+| Weather + sun | `cmd/weather` | `ghcr.io/resnostyle/ha-mqtt` |
+| Cast / Google Home ping | `cmd/pinger` | `ghcr.io/resnostyle/ha-mqtt/pinger` |
 
-Configure with `HA_WEATHER_SOURCES`:
+Shared code lives under [`internal/lib`](internal/lib) (HA client, MQTT publisher, env helpers).
+
+## Weather service
+
+Poll Home Assistant weather entities (Pirate Weather, Met.no, …) and sun day context, then publish retained JSON to Mosquitto. Optional MQTT discovery creates sensors under one device per source.
+
+Configure sources with `HA_WEATHER_SOURCES`:
 
 ```bash
 HA_WEATHER_SOURCES=pirate:weather.pirateweather,metno:weather.forecast_home
 ```
 
-Each `name:entity_id` pair gets its own topic tree and discovery device.
-
-## Topics
+### Topics
 
 For each source name (e.g. `pirate`, `metno`):
 
 | Topic | Contents |
 |-------|----------|
 | `home/weather/<name>/current` | Current condition + attributes |
-| `home/weather/<name>/daily` | Full daily forecast from `weather.get_forecasts` |
-| `home/weather/<name>/hourly` | Hourly forecast (default next 48 hours; skipped if unsupported) |
+| `home/weather/<name>/daily` | Full daily forecast |
+| `home/weather/<name>/hourly` | Hourly forecast (skipped if unsupported) |
 | `home/weather/<name>/5day` | Compact 5-day summary |
 
-All messages are retained JSON.
+When `SUN_ENABLED=true` (default), also publishes `home/sun/current`.
 
-> **Note:** Earlier builds used unscoped `home/weather/current`. Topics are now
-> namespaced per source (`…/pirate/…`, `…/metno/…`).
+See [`.env.example`](.env.example) for all weather variables.
 
-## MQTT discovery (Home Assistant)
+## Pinger service
 
-On startup the bridge publishes retained configs to
-`homeassistant/sensor/<id>/config`.
+Discover Google Cast / Google Home devices from Home Assistant, probe LAN connectivity, and publish retained JSON metrics to Mosquitto. Optional MQTT discovery creates latency and reachability sensors per device.
 
-Example entities:
+1. **Discovery** — HA entity/device registry over WebSocket; filters Cast `media_player` entities (default manufacturer `Google Inc.`, excludes Cast groups).
+2. **IP resolution** — browses `_googlecast._tcp.local.` via mDNS and matches Cast UUIDs from HA to LAN IPs.
+3. **Probing** — TCP connect to port 8008 (default) or optional ICMP ping.
+4. **MQTT** — per-device metrics plus a summary topic.
 
-- `sensor.weather_mqtt_pirate_temperature`
-- `sensor.weather_mqtt_pirate_daily`
-- `sensor.weather_mqtt_metno_temperature`
-- `sensor.weather_mqtt_metno_5day`
+### Topics
 
-Devices:
+| Topic | Contents |
+|-------|----------|
+| `home/ping/<slug>/current` | Latest probe + rolling stats for one device |
+| `home/ping/summary` | Snapshot of all devices |
 
-- **Weather MQTT (Pirate Weather)**
-- **Weather MQTT (Met.no)**
-
-Set `MQTT_DISCOVERY_ENABLED=false` to skip discovery and only publish data topics.
+See [`.env.pinger.example`](.env.pinger.example) for all pinger variables. Use `network_mode: host` in Docker so mDNS and LAN probes work; add `cap_add: [NET_RAW]` for `PING_METHOD=icmp`.
 
 ## Quick start
 
@@ -55,10 +58,16 @@ Set `MQTT_DISCOVERY_ENABLED=false` to skip discovery and only publish data topic
 cp .env.example .env
 # Edit HA_URL, HA_TOKEN, MQTT_*, HA_WEATHER_SOURCES
 
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python -m src.main
+go test ./...
+go run ./cmd/weather
+```
+
+Pinger:
+
+```bash
+cp .env.pinger.example .env.pinger
+set -a && source .env.pinger && set +a
+go run ./cmd/pinger
 ```
 
 Create a long-lived access token in Home Assistant (Profile → Security).
@@ -66,22 +75,35 @@ Create a long-lived access token in Home Assistant (Profile → Security).
 ## Docker
 
 ```bash
-docker compose -f docker-compose.example.yml up -d --build
+docker compose up -d --build
 ```
 
-Or add to the Home Assistant host compose as an image-only sidecar:
+Or add sidecars to your Home Assistant host compose:
 
 ```yaml
-weather-mqtt:
-  image: ghcr.io/resnostyle/weather-mqtt:latest
-  container_name: weather-mqtt
+ha-mqtt-weather:
+  image: ghcr.io/resnostyle/ha-mqtt:latest
+  container_name: ha-mqtt-weather
   restart: unless-stopped
   network_mode: host
   env_file: .env
+
+ha-mqtt-pinger:
+  image: ghcr.io/resnostyle/ha-mqtt/pinger:latest
+  container_name: ha-mqtt-pinger
+  restart: unless-stopped
+  network_mode: host
+  env_file: .env.pinger
 ```
 
-CI on `main` runs tests, then builds and pushes `linux/amd64` + `linux/arm64` images to GHCR (`ghcr.io/resnostyle/weather-mqtt`).
+CI on `main` runs `go test ./...`, then builds and pushes `linux/amd64` + `linux/arm64` images to GHCR.
 
-## Environment
+## Layout
 
-See [`.env.example`](.env.example). Required: `HA_URL`, `HA_TOKEN`.
+```
+cmd/weather/          weather + sun poller
+cmd/pinger/           Cast ping service
+internal/lib/         shared HA, MQTT, env, poll loop
+internal/weather/     weather payloads + discovery
+internal/pinger/      cast discovery, mDNS, probe, discovery
+```
