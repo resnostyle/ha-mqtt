@@ -258,9 +258,9 @@ func TestProbeTCPSuccessAndTimeout(t *testing.T) {
 	}
 
 	p := NewPinger(testSettings())
-	p.ProbeTCP = func(host string, port, timeoutMS int) ProbeResult {
+	p.SetProbeTCP(func(host string, port, timeoutMS int) ProbeResult {
 		return ProbeResult{Reachable: false, Error: "timeout", ProbedAt: "t"}
-	}
+	})
 	res, _ := p.Probe(testTarget(testHost))
 	if res.Reachable || res.Error != "timeout" {
 		t.Fatalf("%+v", res)
@@ -277,11 +277,11 @@ func TestPingerRollingStats(t *testing.T) {
 		{Reachable: false, Error: "timeout", ProbedAt: "t3"},
 	}
 	i := 0
-	p.ProbeTCP = func(host string, port, timeoutMS int) ProbeResult {
+	p.SetProbeTCP(func(host string, port, timeoutMS int) ProbeResult {
 		r := seq[i]
 		i++
 		return r
-	}
+	})
 	target := testTarget(testHost)
 	p.Probe(target)
 	p.Probe(target)

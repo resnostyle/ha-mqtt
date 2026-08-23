@@ -43,7 +43,7 @@ func (f *fakeMQTT) PublishDiscovery(configs []mqttpub.Config, discoveryPrefix st
 
 func TestPublishOnce(t *testing.T) {
 	settings := Settings{
-		Common: env.Common{MQTTTopicPrefix: "home/weather"},
+		Common: env.Common{MQTT: env.MQTT{MQTTTopicPrefix: "home/weather"}},
 		WeatherSources: []Source{{
 			Name: "pirate", EntityID: "weather.pirateweather", Label: "Pirate Weather",
 		}},

@@ -54,6 +54,16 @@ jobs:
             image: ghcr.io/resnostyle/ha-mqtt/pinger
             title: ha-mqtt pinger
             description: Discover Google Cast devices, probe LAN connectivity, and publish metrics to MQTT
+          - service: monitor
+            dockerfile: Dockerfile.monitor
+            image: ghcr.io/resnostyle/ha-mqtt/monitor
+            title: ha-mqtt monitor
+            description: Probe configured hosts and publish reachability metrics to MQTT
+          - service: speedtest
+            dockerfile: Dockerfile.speedtest
+            image: ghcr.io/resnostyle/ha-mqtt/speedtest
+            title: ha-mqtt speedtest
+            description: Run periodic internet speed tests and publish Mbps metrics to MQTT
     steps:
       - name: Checkout
         uses: actions/checkout@v4
