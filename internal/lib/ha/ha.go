@@ -86,14 +86,50 @@ type EntityRegistryEntry struct {
 	AreaID       *string `json:"area_id"`
 }
 
+// IdentifierPairs is a device registry identifiers field. HA may encode
+// identifier values as JSON strings or numbers depending on the integration.
+type IdentifierPairs [][]string
+
+func (p *IdentifierPairs) UnmarshalJSON(data []byte) error {
+	var raw [][]json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	out := make([][]string, len(raw))
+	for i, pair := range raw {
+		out[i] = make([]string, len(pair))
+		for j, elem := range pair {
+			s, err := decodeIdentifierValue(elem)
+			if err != nil {
+				return fmt.Errorf("identifiers[%d][%d]: %w", i, j, err)
+			}
+			out[i][j] = s
+		}
+	}
+	*p = out
+	return nil
+}
+
+func decodeIdentifierValue(data []byte) (string, error) {
+	var s string
+	if err := json.Unmarshal(data, &s); err == nil {
+		return s, nil
+	}
+	var n json.Number
+	if err := json.Unmarshal(data, &n); err == nil {
+		return n.String(), nil
+	}
+	return "", fmt.Errorf("expected string or number, got %s", string(data))
+}
+
 type DeviceRegistryEntry struct {
-	ID           string     `json:"id"`
-	Name         string     `json:"name"`
-	NameByUser   string     `json:"name_by_user"`
-	Manufacturer string     `json:"manufacturer"`
-	Model        string     `json:"model"`
-	Identifiers  [][]string `json:"identifiers"`
-	AreaID       *string    `json:"area_id"`
+	ID           string           `json:"id"`
+	Name         string           `json:"name"`
+	NameByUser   string           `json:"name_by_user"`
+	Manufacturer string           `json:"manufacturer"`
+	Model        string           `json:"model"`
+	Identifiers  IdentifierPairs  `json:"identifiers"`
+	AreaID       *string          `json:"area_id"`
 }
 
 func (c *Client) ListEntityRegistry(ctx context.Context) ([]EntityRegistryEntry, error) {

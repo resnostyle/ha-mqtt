@@ -140,10 +140,10 @@ func TestDiscoverCastTargetsFiltersAndDedupes(t *testing.T) {
 		{EntityID: "media_player.disabled_speaker", Platform: "cast", DeviceID: "dev4", DisabledBy: &disabled, OriginalName: strPtr("Disabled")},
 	}
 	devices := []ha.DeviceRegistryEntry{
-		{ID: "dev1", Name: "Example speaker", Manufacturer: "Google Inc.", Model: "Google Home", Identifiers: [][]string{{"cast", testCastUUID}}},
-		{ID: "dev2", Name: "Example group", Manufacturer: "Google Inc.", Model: "Google Cast Group", Identifiers: [][]string{{"cast", testCastGroupUUID}}},
-		{ID: "dev3", Name: "Example TV", Manufacturer: "Example Corp", Model: "Example Streamer", Identifiers: [][]string{{"cast", testTVCastUUID}}},
-		{ID: "dev4", Name: "Disabled", Manufacturer: "Google Inc.", Model: "Google Home Mini", Identifiers: [][]string{{"cast", testDisabledUUID}}},
+		{ID: "dev1", Name: "Example speaker", Manufacturer: "Google Inc.", Model: "Google Home", Identifiers: ha.IdentifierPairs{{"cast", testCastUUID}}},
+		{ID: "dev2", Name: "Example group", Manufacturer: "Google Inc.", Model: "Google Cast Group", Identifiers: ha.IdentifierPairs{{"cast", testCastGroupUUID}}},
+		{ID: "dev3", Name: "Example TV", Manufacturer: "Example Corp", Model: "Example Streamer", Identifiers: ha.IdentifierPairs{{"cast", testTVCastUUID}}},
+		{ID: "dev4", Name: "Disabled", Manufacturer: "Google Inc.", Model: "Google Home Mini", Identifiers: ha.IdentifierPairs{{"cast", testDisabledUUID}}},
 	}
 	targets := DiscoverCastTargets(entities, devices, testSettings())
 	if len(targets) != 1 {

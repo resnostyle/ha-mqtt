@@ -50,25 +50,20 @@ Discover Google Cast / Google Home devices from Home Assistant, probe LAN connec
 | `home/ping/<slug>/current` | Latest probe + rolling stats for one device |
 | `home/ping/summary` | Snapshot of all devices |
 
-See [`.env.pinger.example`](.env.pinger.example) for all pinger variables. Use `network_mode: host` in Docker so mDNS and LAN probes work; add `cap_add: [NET_RAW]` for `PING_METHOD=icmp`.
+See [`.env.example`](.env.example) for shared variables (including optional `PING_*`). For a dedicated pinger-only env file (e.g. Docker/K8s), see [`.env.pinger.example`](.env.pinger.example). Use `network_mode: host` in Docker so mDNS and LAN probes work; add `cap_add: [NET_RAW]` for `PING_METHOD=icmp`.
 
 ## Quick start
 
 ```bash
 cp .env.example .env
-# Edit HA_URL, HA_TOKEN, MQTT_*, HA_WEATHER_SOURCES
+# Edit HA_URL, HA_TOKEN, MQTT_*, HA_WEATHER_SOURCES (and optional PING_* below)
 
 go test ./...
-go run ./cmd/weather
+mise run weather   # loads .env
+mise run pinger    # loads .env; overrides MQTT topic/client for ping
 ```
 
-Pinger:
-
-```bash
-cp .env.pinger.example .env.pinger
-set -a && source .env.pinger && set +a
-go run ./cmd/pinger
-```
+Both tasks share `.env`. Weather uses `MQTT_TOPIC_PREFIX` / `MQTT_CLIENT_ID` from the file; `mise run pinger` forces `home/ping` and `pinger-mqtt` so they do not collide.
 
 Create a long-lived access token in Home Assistant (Profile → Security).
 
