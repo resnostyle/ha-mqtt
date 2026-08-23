@@ -7,7 +7,10 @@ services:
     image: ghcr.io/resnostyle/ha-mqtt/weather:latest
     # build:
     #   context: .
-    #   dockerfile: Dockerfile.weather
+    #   dockerfile: Dockerfile
+    #   args:
+    #     SERVICE: weather
+    #     RUNTIME: distroless
     container_name: ha-mqtt-weather
     restart: unless-stopped
     network_mode: host
@@ -18,7 +21,10 @@ services:
     image: ghcr.io/resnostyle/ha-mqtt/pinger:latest
     # build:
     #   context: .
-    #   dockerfile: Dockerfile.pinger
+    #   dockerfile: Dockerfile
+    #   args:
+    #     SERVICE: pinger
+    #     RUNTIME: alpine
     container_name: ha-mqtt-pinger
     restart: unless-stopped
     network_mode: host
@@ -32,7 +38,10 @@ services:
     image: ghcr.io/resnostyle/ha-mqtt/monitor:latest
     # build:
     #   context: .
-    #   dockerfile: Dockerfile.monitor
+    #   dockerfile: Dockerfile
+    #   args:
+    #     SERVICE: monitor
+    #     RUNTIME: alpine
     container_name: ha-mqtt-monitor
     restart: unless-stopped
     network_mode: host
@@ -46,7 +55,10 @@ services:
     image: ghcr.io/resnostyle/ha-mqtt/speedtest:latest
     # build:
     #   context: .
-    #   dockerfile: Dockerfile.speedtest
+    #   dockerfile: Dockerfile
+    #   args:
+    #     SERVICE: speedtest
+    #     RUNTIME: distroless
     container_name: ha-mqtt-speedtest
     restart: unless-stopped
     network_mode: host

@@ -45,22 +45,22 @@ jobs:
       matrix:
         include:
           - service: weather
-            dockerfile: Dockerfile.weather
+            runtime: distroless
             image: ghcr.io/resnostyle/ha-mqtt/weather
             title: ha-mqtt weather
             description: Poll Home Assistant weather and sun entities and publish retained JSON to MQTT
           - service: pinger
-            dockerfile: Dockerfile.pinger
+            runtime: alpine
             image: ghcr.io/resnostyle/ha-mqtt/pinger
             title: ha-mqtt pinger
             description: Discover Google Cast devices, probe LAN connectivity, and publish metrics to MQTT
           - service: monitor
-            dockerfile: Dockerfile.monitor
+            runtime: alpine
             image: ghcr.io/resnostyle/ha-mqtt/monitor
             title: ha-mqtt monitor
             description: Probe configured hosts and publish reachability metrics to MQTT
           - service: speedtest
-            dockerfile: Dockerfile.speedtest
+            runtime: distroless
             image: ghcr.io/resnostyle/ha-mqtt/speedtest
             title: ha-mqtt speedtest
             description: Run periodic internet speed tests and publish Mbps metrics to MQTT
@@ -97,11 +97,14 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ${{ matrix.dockerfile }}
+          file: Dockerfile
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            SERVICE=${{ matrix.service }}
+            RUNTIME=${{ matrix.runtime }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
           provenance: false
