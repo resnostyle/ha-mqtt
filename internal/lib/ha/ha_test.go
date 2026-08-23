@@ -173,3 +173,21 @@ func deref(s *string) string {
 	}
 	return *s
 }
+
+func TestDeviceRegistryNumericIdentifiers(t *testing.T) {
+	const payload = `[{"id":"dev1","identifiers":[["cast","abc-def"],["zwave_js",12345]]}]`
+	var entries []DeviceRegistryEntry
+	if err := json.Unmarshal([]byte(payload), &entries); err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 1 {
+		t.Fatalf("len %d", len(entries))
+	}
+	ids := entries[0].Identifiers
+	if len(ids) != 2 || ids[0][0] != "cast" || ids[0][1] != "abc-def" {
+		t.Fatalf("cast identifier %v", ids[0])
+	}
+	if ids[1][0] != "zwave_js" || ids[1][1] != "12345" {
+		t.Fatalf("numeric identifier %v", ids[1])
+	}
+}

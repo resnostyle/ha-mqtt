@@ -9,9 +9,12 @@ run = "go test ./..."
 
 [tasks.weather]
 run = "go run ./cmd/weather"
+env = { _.file = ".env" }
 
 [tasks.pinger]
 run = "go run ./cmd/pinger"
+# Shared .env uses weather MQTT_TOPIC_PREFIX / MQTT_CLIENT_ID; override for pinger.
+env = { _.file = ".env", MQTT_TOPIC_PREFIX = "home/ping", MQTT_CLIENT_ID = "pinger-mqtt" }
 
 [tasks.build]
 run = [

@@ -84,7 +84,7 @@ func DiscoverCastTargets(entities []ha.EntityRegistryEntry, devices []ha.DeviceR
 		if _, excluded := settings.PingExcludeModels[model]; excluded {
 			continue
 		}
-		castUUID := extractCastUUID(device.Identifiers)
+		castUUID := extractCastUUID([][]string(device.Identifiers))
 		if castUUID == "" {
 			slog.Debug("skipping entity: no cast UUID", "entity", entityID)
 			continue
