@@ -52,3 +52,25 @@ func TestLoadCommon(t *testing.T) {
 		t.Fatalf("prefix %q", c.MQTTTopicPrefix)
 	}
 }
+
+func TestLoadMQTT(t *testing.T) {
+	t.Setenv("MQTT_HOST", "mqtt.example.test")
+	t.Setenv("MQTT_PORT", "1885")
+	t.Setenv("MQTT_CLIENT_ID", "monitor-mqtt")
+	m, err := LoadMQTT("home/monitor", "monitor-mqtt-default")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m.MQTTHost != "mqtt.example.test" {
+		t.Fatalf("host %q", m.MQTTHost)
+	}
+	if m.MQTTPort != 1885 {
+		t.Fatalf("port %d", m.MQTTPort)
+	}
+	if m.MQTTTopicPrefix != "home/monitor" {
+		t.Fatalf("prefix %q", m.MQTTTopicPrefix)
+	}
+	if m.MQTTClientID != "monitor-mqtt" {
+		t.Fatalf("client %q", m.MQTTClientID)
+	}
+}

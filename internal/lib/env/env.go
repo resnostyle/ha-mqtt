@@ -8,19 +8,11 @@ import (
 	"strings"
 )
 
-// Common is HA + MQTT + logging configuration shared by every service.
+// Common is HA + MQTT + logging configuration shared by HA-backed services.
 type Common struct {
-	HAURL                  string
-	HAToken                string
-	MQTTHost               string
-	MQTTPort               int
-	MQTTUsername           string
-	MQTTPassword           string
-	MQTTTopicPrefix        string
-	MQTTClientID           string
-	MQTTDiscoveryEnabled   bool
-	MQTTDiscoveryPrefix    string
-	LogLevel               string
+	HAURL   string
+	HAToken string
+	MQTT
 }
 
 func Require(name string) (string, error) {
@@ -88,21 +80,13 @@ func LoadCommon(defaultTopicPrefix, defaultClientID string) (Common, error) {
 	if err != nil {
 		return Common{}, err
 	}
-	port, err := Int("MQTT_PORT", 1883)
+	mqtt, err := LoadMQTT(defaultTopicPrefix, defaultClientID)
 	if err != nil {
 		return Common{}, err
 	}
 	return Common{
-		HAURL:                strings.TrimRight(url, "/"),
-		HAToken:              token,
-		MQTTHost:             Get("MQTT_HOST", "127.0.0.1"),
-		MQTTPort:             port,
-		MQTTUsername:         strings.TrimSpace(os.Getenv("MQTT_USERNAME")),
-		MQTTPassword:         strings.TrimSpace(os.Getenv("MQTT_PASSWORD")),
-		MQTTTopicPrefix:      strings.TrimRight(Get("MQTT_TOPIC_PREFIX", defaultTopicPrefix), "/"),
-		MQTTClientID:         Get("MQTT_CLIENT_ID", defaultClientID),
-		MQTTDiscoveryEnabled: Bool("MQTT_DISCOVERY_ENABLED", true),
-		MQTTDiscoveryPrefix:  strings.TrimRight(Get("MQTT_DISCOVERY_PREFIX", "homeassistant"), "/"),
-		LogLevel:             strings.ToUpper(Get("LOG_LEVEL", "INFO")),
+		HAURL:   strings.TrimRight(url, "/"),
+		HAToken: token,
+		MQTT:    mqtt,
 	}, nil
 }

@@ -1,5 +1,6 @@
 # Example sidecar services next to Home Assistant / Mosquitto.
-# Copy env from .env.example (weather) and .env.pinger.example (pinger).
+# Copy env from .env.example (weather), .env.pinger.example (pinger),
+# .env.monitor.example (monitor), and .env.speedtest.example (speedtest).
 
 services:
   weather:
@@ -26,3 +27,28 @@ services:
     # Required for PING_METHOD=icmp:
     # cap_add:
     #   - NET_RAW
+
+  monitor:
+    image: ghcr.io/resnostyle/ha-mqtt/monitor:latest
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.monitor
+    container_name: ha-mqtt-monitor
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - .env.monitor
+    # Required for MONITOR_METHOD=icmp (default):
+    # cap_add:
+    #   - NET_RAW
+
+  speedtest:
+    image: ghcr.io/resnostyle/ha-mqtt/speedtest:latest
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.speedtest
+    container_name: ha-mqtt-speedtest
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - .env.speedtest

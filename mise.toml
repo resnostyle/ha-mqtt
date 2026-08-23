@@ -16,8 +16,20 @@ run = "go run ./cmd/pinger"
 # Shared .env uses weather MQTT_TOPIC_PREFIX / MQTT_CLIENT_ID; override for pinger.
 env = { _.file = ".env", MQTT_TOPIC_PREFIX = "home/ping", MQTT_CLIENT_ID = "pinger-mqtt" }
 
+[tasks.monitor]
+run = "go run ./cmd/monitor"
+# Shared .env uses weather MQTT_TOPIC_PREFIX / MQTT_CLIENT_ID; override for monitor.
+env = { _.file = ".env", MQTT_TOPIC_PREFIX = "home/monitor", MQTT_CLIENT_ID = "monitor-mqtt" }
+
+[tasks.speedtest]
+run = "go run ./cmd/speedtest"
+# Shared .env uses weather MQTT_TOPIC_PREFIX / MQTT_CLIENT_ID; override for speedtest.
+env = { _.file = ".env", MQTT_TOPIC_PREFIX = "home/speedtest", MQTT_CLIENT_ID = "speedtest-mqtt" }
+
 [tasks.build]
 run = [
   "go build -o bin/weather ./cmd/weather",
   "go build -o bin/pinger ./cmd/pinger",
+  "go build -o bin/monitor ./cmd/monitor",
+  "go build -o bin/speedtest ./cmd/speedtest",
 ]
