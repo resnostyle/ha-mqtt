@@ -166,11 +166,11 @@ After the first push, open each package under **GitHub → Packages** and set vi
 
 ## Kubernetes
 
-Helm charts in the k8s-gitops repo deploy services to the `automation` namespace.
+These services are designed to run as cluster workloads alongside an MQTT broker.
 
-**Weather** runs as a normal pod. Point `MQTT_HOST` at the in-cluster broker (e.g. `emqx.automation.svc.cluster.local`). Secrets (`HA_TOKEN`, optional `MQTT_USERNAME` / `MQTT_PASSWORD`) come from the `weather-mqtt-secrets` Vault-synced secret.
+**Weather** runs as a normal pod. Point `MQTT_HOST` at your in-cluster broker. Mount secrets for `HA_TOKEN` and optional `MQTT_USERNAME` / `MQTT_PASSWORD`.
 
-**Pinger** requires `hostNetwork: true` so mDNS can discover Cast devices and TCP probes reach LAN hosts. It reuses the same `weather-mqtt-secrets` secret. For `PING_METHOD=icmp`, add `securityContext.capabilities.add: [NET_RAW]`.
+**Pinger** requires `hostNetwork: true` so mDNS can discover Cast devices and TCP probes reach LAN hosts. Reuse the same HA/MQTT secret. For `PING_METHOD=icmp`, add `securityContext.capabilities.add: [NET_RAW]`.
 
 **Monitor** also needs `hostNetwork: true` so probes reach LAN hosts. It only needs MQTT credentials (no HA token). For `MONITOR_METHOD=icmp` (default), add `securityContext.capabilities.add: [NET_RAW]`.
 
