@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/coder/websocket v1.8.15
 	github.com/grandcat/zeroconf v1.0.0
-	github.com/resnostyle/mqttkit v0.0.0-20260907115432-3061fa789ccd
+	github.com/resnostyle/mqttkit v0.0.3
 	github.com/showwin/speedtest-go v1.7.11
 )
 
