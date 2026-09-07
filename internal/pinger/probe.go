@@ -54,14 +54,6 @@ func (p *Pinger) ProbeAll(targets []PingTarget) []ProbeOutcome {
 	return out
 }
 
-func utcNowISO() string {
-	return probe.UTCNowISO()
-}
-
-func nilIfEmpty(s string) any {
-	return probe.NilIfEmpty(s)
-}
-
 func probeTCP(host string, port, timeoutMS int) ProbeResult {
 	return probe.TCP(host, port, timeoutMS)
 }

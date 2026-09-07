@@ -1,5 +1,7 @@
 package pinger
 
+import "github.com/resnostyle/mqttkit/payload"
+
 import (
 	"log/slog"
 	"regexp"
@@ -94,7 +96,7 @@ func DiscoverCastTargets(entities []ha.EntityRegistryEntry, devices []ha.DeviceR
 		target := PingTarget{
 			EntityID:     entityID,
 			DeviceID:     entry.DeviceID,
-			Slug:         Slugify(slugBase),
+			Slug:         payload.Slugify(slugBase, "device"),
 			FriendlyName: friendly,
 			CastUUID:     castUUID,
 			Manufacturer: manufacturer,

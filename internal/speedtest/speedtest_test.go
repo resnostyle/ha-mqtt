@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/env"
-	"github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
+	"github.com/resnostyle/mqttkit/env"
+	"github.com/resnostyle/mqttkit/mqttpub"
 )
 
 func fptr(v float64) *float64 { return &v }
@@ -24,6 +24,10 @@ func (f *fakeMQTT) Publish(topicSuffix string, payload any, retain bool) error {
 		payload any
 	}{topicSuffix, payload})
 	return nil
+}
+
+func (f *fakeMQTT) PublishQuiet(suffix string, payload any, retain bool) error {
+	return f.Publish(suffix, payload, retain)
 }
 
 func (f *fakeMQTT) PublishRaw(topic string, payload any, retain bool) error {

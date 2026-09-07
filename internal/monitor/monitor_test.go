@@ -1,10 +1,12 @@
 package monitor
 
+import "github.com/resnostyle/mqttkit/payload"
+
 import (
 	"testing"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
 	"github.com/resnostyle/ha-mqtt/internal/lib/probe"
+	"github.com/resnostyle/mqttkit/mqttpub"
 )
 
 func fptr(v float64) *float64 { return &v }
@@ -44,11 +46,11 @@ func TestParseHostsRejectsInvalid(t *testing.T) {
 }
 
 func TestSlugify(t *testing.T) {
-	if Slugify("router") != "router" {
-		t.Fatal(Slugify("router"))
+	if payload.Slugify("router", "host") != "router" {
+		t.Fatal(payload.Slugify("router", "host"))
 	}
-	if Slugify("my-nas") != "my_nas" {
-		t.Fatal(Slugify("my-nas"))
+	if payload.Slugify("my-nas", "host") != "my_nas" {
+		t.Fatal(payload.Slugify("my-nas", "host"))
 	}
 }
 

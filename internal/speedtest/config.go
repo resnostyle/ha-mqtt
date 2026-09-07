@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/env"
+	"github.com/resnostyle/mqttkit/env"
 )
 
 type Settings struct {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
+	"github.com/resnostyle/mqttkit/mqttpub"
 )
 
 func PublishDiscovery(settings Settings, mqtt mqttpub.Sink) error {

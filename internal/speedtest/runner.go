@@ -1,5 +1,7 @@
 package speedtest
 
+import "github.com/resnostyle/mqttkit/payload"
+
 import (
 	"context"
 	"fmt"
@@ -36,7 +38,7 @@ func NewLibRunner() *LibRunner {
 }
 
 func (r *LibRunner) Run(ctx context.Context, serverID string) Result {
-	testedAt := utcNowISO()
+	testedAt := payload.UTCNowISO()
 	client := lib.New()
 
 	var server *lib.Server
@@ -129,8 +131,3 @@ func serverLocation(s *lib.Server) string {
 func round1(v float64) float64 {
 	return math.Round(v*10) / 10
 }
-
-func utcNowISO() string {
-	return time.Now().UTC().Truncate(time.Second).Format(time.RFC3339)
-}
-
