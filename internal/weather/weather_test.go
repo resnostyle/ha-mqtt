@@ -3,7 +3,7 @@ package weather
 import (
 	"testing"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
+	"github.com/resnostyle/mqttkit/mqttpub"
 )
 
 func TestNormalizeUnit(t *testing.T) {

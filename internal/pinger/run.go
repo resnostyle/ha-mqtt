@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/resnostyle/ha-mqtt/internal/lib/ha"
-	"github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
+	"github.com/resnostyle/mqttkit/mqttpub"
 )
 
 type RegistryClient interface {

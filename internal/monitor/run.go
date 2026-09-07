@@ -3,8 +3,8 @@ package monitor
 import (
 	"log/slog"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
 	"github.com/resnostyle/ha-mqtt/internal/lib/probe"
+	"github.com/resnostyle/mqttkit/mqttpub"
 )
 
 type ProbeOutcome struct {

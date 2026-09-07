@@ -1,12 +1,14 @@
 package monitor
 
+import "github.com/resnostyle/mqttkit/payload"
+
 import (
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/env"
+	"github.com/resnostyle/mqttkit/env"
 )
 
 type HostTarget struct {
@@ -94,7 +96,7 @@ func ParseHosts(raw string) ([]HostTarget, error) {
 		seen[name] = struct{}{}
 		hosts = append(hosts, HostTarget{
 			Name: name,
-			Slug: Slugify(name),
+			Slug: payload.Slugify(name, "host"),
 			Host: host,
 		})
 	}
@@ -102,15 +104,4 @@ func ParseHosts(raw string) ([]HostTarget, error) {
 		return nil, fmt.Errorf("MONITOR_HOSTS is empty")
 	}
 	return hosts, nil
-}
-
-var slugRE = regexp.MustCompile(`[^a-z0-9_]+`)
-
-func Slugify(value string) string {
-	slug := slugRE.ReplaceAllString(strings.ToLower(strings.TrimSpace(value)), "_")
-	slug = strings.Trim(slug, "_")
-	if slug == "" {
-		return "host"
-	}
-	return slug
 }

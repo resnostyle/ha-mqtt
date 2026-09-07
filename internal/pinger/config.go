@@ -3,10 +3,9 @@ package pinger
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/env"
+	"github.com/resnostyle/mqttkit/env"
 )
 
 type PingTarget struct {
@@ -28,15 +27,15 @@ func (t PingTarget) WithHost(host string) PingTarget {
 
 type Settings struct {
 	env.Common
-	PingIntervalSeconds          int
-	PingDiscoveryRefreshSeconds  int
-	PingMethod                   string
-	PingTimeoutMS                int
-	PingTCPPort                  int
-	PingStatsWindow              int
-	PingManufacturerFilter       map[string]struct{}
-	PingExcludeModels            map[string]struct{}
-	PingHostOverrides            map[string]string
+	PingIntervalSeconds         int
+	PingDiscoveryRefreshSeconds int
+	PingMethod                  string
+	PingTimeoutMS               int
+	PingTCPPort                 int
+	PingStatsWindow             int
+	PingManufacturerFilter      map[string]struct{}
+	PingExcludeModels           map[string]struct{}
+	PingHostOverrides           map[string]string
 }
 
 func FromEnv() (Settings, error) {
@@ -102,15 +101,4 @@ func parseHostOverrides(raw string) (map[string]string, error) {
 		overrides[entityID] = host
 	}
 	return overrides, nil
-}
-
-var slugRE = regexp.MustCompile(`[^a-z0-9_]+`)
-
-func Slugify(value string) string {
-	slug := slugRE.ReplaceAllString(strings.ToLower(strings.TrimSpace(value)), "_")
-	slug = strings.Trim(slug, "_")
-	if slug == "" {
-		return "device"
-	}
-	return slug
 }

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/env"
+	"github.com/resnostyle/mqttkit/env"
 )
 
 var sourceNameRE = regexp.MustCompile(`^[a-z][a-z0-9_]*$`)

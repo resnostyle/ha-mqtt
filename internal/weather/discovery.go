@@ -1,16 +1,14 @@
 package weather
 
-import "github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
+import (
+	"github.com/resnostyle/mqttkit/hadisc"
+	"github.com/resnostyle/mqttkit/mqttpub"
+)
 
 const deviceManufacturer = "weather-mqtt"
 
 func deviceBlock(sourceName, sourceLabel string) map[string]any {
-	return map[string]any{
-		"identifiers":  []string{"weather_mqtt_" + sourceName},
-		"name":         "Weather MQTT (" + sourceLabel + ")",
-		"manufacturer": deviceManufacturer,
-		"model":        sourceLabel + " bridge",
-	}
+	return hadisc.Device([]string{"weather_mqtt_" + sourceName}, "Weather MQTT ("+sourceLabel+")", deviceManufacturer, sourceLabel+" bridge")
 }
 
 func sensor(objectID, name, stateTopic, valueTemplate, uniqueID string, device map[string]any, extras map[string]any) mqttpub.Config {
@@ -110,12 +108,7 @@ func BuildDiscoveryConfigs(topicPrefix, sourceName, sourceLabel, temperatureUnit
 
 func BuildSunDiscoveryConfigs(topicPrefix string) []mqttpub.Config {
 	current := topicPrefix + "/current"
-	device := map[string]any{
-		"identifiers":  []string{"weather_mqtt_sun"},
-		"name":         "Sun MQTT",
-		"manufacturer": deviceManufacturer,
-		"model":        "Sun day-context bridge",
-	}
+	device := hadisc.Device([]string{"weather_mqtt_sun"}, "Sun MQTT", deviceManufacturer, "Sun day-context bridge")
 	uid := "weather_mqtt_sun"
 	return []mqttpub.Config{
 		sensor(uid+"_state", "State", current, "{{ value_json.state }}", uid+"_state", device, map[string]any{

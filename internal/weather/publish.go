@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
+	"github.com/resnostyle/mqttkit/mqttpub"
 )
 
 type HAClient interface {

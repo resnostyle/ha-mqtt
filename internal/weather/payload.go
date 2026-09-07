@@ -1,7 +1,7 @@
 package weather
 
 import (
-	"time"
+	"github.com/resnostyle/mqttkit/payload"
 )
 
 var conditionLabels = map[string]string{
@@ -22,10 +22,6 @@ var conditionLabels = map[string]string{
 	"exceptional":     "Exceptional",
 }
 
-func utcNowISO() string {
-	return time.Now().UTC().Truncate(time.Second).Format(time.RFC3339)
-}
-
 func attrs(state map[string]any) map[string]any {
 	if a, ok := state["attributes"].(map[string]any); ok && a != nil {
 		return a
@@ -37,7 +33,7 @@ func BuildCurrent(state map[string]any) map[string]any {
 	a := attrs(state)
 	updated := state["last_updated"]
 	if updated == nil {
-		updated = utcNowISO()
+		updated = payload.UTCNowISO()
 	}
 	return map[string]any{
 		"condition":            state["state"],
@@ -60,7 +56,7 @@ func BuildCurrent(state map[string]any) map[string]any {
 		"attribution":          a["attribution"],
 		"entity_id":            state["entity_id"],
 		"updated":              updated,
-		"published":            utcNowISO(),
+		"published":            payload.UTCNowISO(),
 	}
 }
 
@@ -69,7 +65,7 @@ func BuildSun(state map[string]any) map[string]any {
 	sunState := state["state"]
 	updated := state["last_updated"]
 	if updated == nil {
-		updated = utcNowISO()
+		updated = payload.UTCNowISO()
 	}
 	return map[string]any{
 		"state":         sunState,
@@ -85,7 +81,7 @@ func BuildSun(state map[string]any) map[string]any {
 		"next_midnight": a["next_midnight"],
 		"entity_id":     state["entity_id"],
 		"updated":       updated,
-		"published":     utcNowISO(),
+		"published":     payload.UTCNowISO(),
 	}
 }
 
@@ -98,7 +94,7 @@ func BuildForecastPayload(forecast []map[string]any, forecastType, entityID stri
 		"entity_id": entityID,
 		"count":     len(forecast),
 		"forecast":  forecast,
-		"published": utcNowISO(),
+		"published": payload.UTCNowISO(),
 	}
 }
 
@@ -124,16 +120,16 @@ func Build5Day(forecast []map[string]any, source, unit string) map[string]any {
 				label = mapped
 			}
 			entries = append(entries, map[string]any{
-				"day_index":                  i,
-				"datetime":                   day["datetime"],
-				"condition":                  label,
-				"condition_raw":              condition,
-				"temperature":                day["temperature"],
-				"templow":                    day["templow"],
-				"humidity":                   day["humidity"],
-				"wind_speed":                 day["wind_speed"],
-				"precipitation":              day["precipitation"],
-				"precipitation_probability":  day["precipitation_probability"],
+				"day_index":                 i,
+				"datetime":                  day["datetime"],
+				"condition":                 label,
+				"condition_raw":             condition,
+				"temperature":               day["temperature"],
+				"templow":                   day["templow"],
+				"humidity":                  day["humidity"],
+				"wind_speed":                day["wind_speed"],
+				"precipitation":             day["precipitation"],
+				"precipitation_probability": day["precipitation_probability"],
 			})
 			continue
 		}
@@ -154,6 +150,6 @@ func Build5Day(forecast []map[string]any, source, unit string) map[string]any {
 			"source":   source,
 		},
 		"forecast":  entries,
-		"published": utcNowISO(),
+		"published": payload.UTCNowISO(),
 	}
 }

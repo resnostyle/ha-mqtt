@@ -1,6 +1,9 @@
 package speedtest
 
-import "github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
+import (
+	"github.com/resnostyle/mqttkit/hadisc"
+	"github.com/resnostyle/mqttkit/mqttpub"
+)
 
 const (
 	deviceManufacturer = "speedtest-mqtt"
@@ -8,12 +11,7 @@ const (
 )
 
 func deviceBlock() map[string]any {
-	return map[string]any{
-		"identifiers":  []string{deviceUID},
-		"name":         "Speedtest MQTT",
-		"manufacturer": deviceManufacturer,
-		"model":        "Internet",
-	}
+	return hadisc.Device([]string{deviceUID}, "Speedtest MQTT", deviceManufacturer, "Internet")
 }
 
 func BuildDiscoveryConfigs(topicPrefix string) []mqttpub.Config {

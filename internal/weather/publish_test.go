@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/resnostyle/ha-mqtt/internal/lib/env"
-	"github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
+	"github.com/resnostyle/mqttkit/env"
+	"github.com/resnostyle/mqttkit/mqttpub"
 )
 
 type fakeHA struct {
@@ -32,6 +32,9 @@ type fakeMQTT struct {
 func (f *fakeMQTT) Publish(suffix string, payload any, retain bool) error {
 	f.topics = append(f.topics, suffix)
 	return nil
+}
+func (f *fakeMQTT) PublishQuiet(suffix string, payload any, retain bool) error {
+	return f.Publish(suffix, payload, retain)
 }
 func (f *fakeMQTT) PublishRaw(topic string, payload any, retain bool) error {
 	f.topics = append(f.topics, topic)

@@ -1,5 +1,7 @@
 package pinger
 
+import "github.com/resnostyle/mqttkit/payload"
+
 import (
 	"context"
 	"net"
@@ -7,15 +9,15 @@ import (
 	"time"
 
 	"github.com/resnostyle/ha-mqtt/internal/lib/ha"
-	"github.com/resnostyle/ha-mqtt/internal/lib/mqttpub"
+	"github.com/resnostyle/mqttkit/mqttpub"
 )
 
 const (
-	testHost         = "192.0.2.10"
-	testHostAlt      = "192.0.2.20"
-	testHostUpdated  = "192.0.2.30"
-	testCastUUID     = "11111111-2222-3333-4444-555555555555"
-	testCastUUIDComp = "11111111222233334444555555555555"
+	testHost          = "192.0.2.10"
+	testHostAlt       = "192.0.2.20"
+	testHostUpdated   = "192.0.2.30"
+	testCastUUID      = "11111111-2222-3333-4444-555555555555"
+	testCastUUIDComp  = "11111111222233334444555555555555"
 	testCastUUIDOther = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
 	testCastGroupUUID = "22222222-3333-4444-5555-666666666666"
 	testTVCastUUID    = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
@@ -48,11 +50,11 @@ func testSettings() Settings {
 }
 
 func TestSlugify(t *testing.T) {
-	if Slugify("Example Speaker") != "example_speaker" {
-		t.Fatal(Slugify("Example Speaker"))
+	if payload.Slugify("Example Speaker", "device") != "example_speaker" {
+		t.Fatal(payload.Slugify("Example Speaker", "device"))
 	}
-	if Slugify("media-player-2") != "media_player_2" {
-		t.Fatal(Slugify("media-player-2"))
+	if payload.Slugify("media-player-2", "device") != "media_player_2" {
+		t.Fatal(payload.Slugify("media-player-2", "device"))
 	}
 }
 
